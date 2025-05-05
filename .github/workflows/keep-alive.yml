@@ -1,34 +1,31 @@
 on:
   schedule:
-    - cron: '58 23 * * *' # Run every day at 11:58 PM (UTC)
+    - cron: '58 23 * * 1,4' # Run on Mondays and Thursdays at 11:58 PM (UTC)
   workflow_dispatch: # Allows manual triggers
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
         with: 
           persist-credentials: false 
-          fetch-depth: 0   # Remove the 'l' that was here
+          fetch-depth: 0
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '14'
-
       - name: Run Node.js Script
         run: |
           npm install
           node index.js
-
       - name: Commit and Push Changes
-        env:                                    # Moved env up
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --local user.name "hayessolo"
           git config --local user.email "solohayes6@gmail.com"
           git add .
           git commit -m "Keep alive update"
-          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"  # Fixed incomplete URL
+          git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
